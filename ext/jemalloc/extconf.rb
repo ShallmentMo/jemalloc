@@ -2,7 +2,7 @@ require 'mkmf'
 require 'rbconfig'
 
 $stdout.sync = true
-pkg = "jemalloc-3.4.0"
+pkg = "jemalloc-5.0.1"
 
 def sys(cmd)
   puts "$ #{cmd}"
@@ -25,9 +25,9 @@ Dir.chdir File.dirname(__FILE__) do
     # configure
     sys "./configure"
     # zone.c is only for Mac OS X
-    if RbConfig::CONFIG['target_vendor'] != "apple"
-      sys "rm -fR src/zone.c"
-    end
+    # if RbConfig::CONFIG['target_vendor'] != "apple"
+    #   sys "rm -fR src/zone.c"
+    # end
     # mkmf only allows *.c files on current dir
     sys "cp src/*.c #{src_dir}"
   end
@@ -43,17 +43,17 @@ create_makefile('jemalloc')
 # generates .bundle by default, but .bundle cannot be dynamically loaded by
 # LD_PRELOAD.
 # NOTICE: Mac OS X only
-if RbConfig::CONFIG['target_vendor'] == "apple"
-  makefile = open('Makefile').read
-  # for 1.9.2 and 1.9.3
-  if makefile =~ /-dynamic\ -bundle/ && makefile =~ /-flat_namespace/
-    makefile.gsub!(/-dynamic\ -bundle/, '-shared')
-    makefile.gsub!(/-flat_namespace/, '-dylib_install_name')
-  # for 2.0.0
-  elsif makefile =~ /-dynamic\ -bundle/
-    makefile.gsub!(/-dynamic\ -bundle/, '-shared')
-  else
-    raise 'Your platform is not supported. Please report to http://github.com/treasure-data/jemalloc-rb'
-  end
-  open('Makefile', 'w'){ |f| f.write(makefile) }
-end
+# if RbConfig::CONFIG['target_vendor'] == "apple"
+#   makefile = open('Makefile').read
+#   # for 1.9.2 and 1.9.3
+#   if makefile =~ /-dynamic\ -bundle/ && makefile =~ /-flat_namespace/
+#     makefile.gsub!(/-dynamic\ -bundle/, '-shared')
+#     makefile.gsub!(/-flat_namespace/, '-dylib_install_name')
+#   # for 2.0.0
+#   elsif makefile =~ /-dynamic\ -bundle/
+#     makefile.gsub!(/-dynamic\ -bundle/, '-shared')
+#   else
+#     raise 'Your platform is not supported. Please report to http://github.com/treasure-data/jemalloc-rb'
+#   end
+#   open('Makefile', 'w'){ |f| f.write(makefile) }
+# end
